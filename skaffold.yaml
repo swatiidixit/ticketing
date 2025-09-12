@@ -1,0 +1,72 @@
+apiVersion: skaffold/v2beta29
+kind: Config
+deploy:
+  kubectl:
+    manifests:
+      - ./infra/k8s/*
+build:   
+  local:
+    push: false 
+    concurrency: 1  # limit to 1 build at a time for low-resource machines
+  artifacts:
+    - image: swati332/auth
+      context: auth
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: 'src/**/*.ts'
+            dest: .
+    - image: swati332/client
+      context: client
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: '**/*.js'
+            dest: .
+    - image: swati332/tickets
+      context: tickets
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: 'src/**/*.ts'
+            dest: .         
+    - image: swati332/orders
+      context: orders
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: 'src/**/*.ts'
+            dest: .         
+    - image: swati332/expiration
+      context: expiration
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: 'src/**/*.ts'
+            dest: .
+    - image: swati332/payments
+      context: payments
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: 'src/**/*.ts'
+            dest: .        
+
+  
+# profiles:
+#   - name: low-resources
+#     build:
+#       local:
+#         concurrency: 1
+#     deploy:
+#       kubectl:
+#         flags:
+#           apply:
+#             - "--prune=false"  # avoid deleting/recreating pods unnecessarily
+

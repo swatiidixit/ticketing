@@ -1,0 +1,22 @@
+{
+  "name": "client",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@stripe/stripe-js": "^7.9.0",
+    "axios": "^1.11.0",
+    "bootstrap": "^5.3.7",
+    "next": "^15.4.6",
+    "prop-types": "^15.8.1",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "react-stripe-checkout": "^2.6.3"
+  }
+}
