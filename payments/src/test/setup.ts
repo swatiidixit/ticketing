@@ -12,6 +12,21 @@ declare global {
 
 jest.mock('../nats-wrapper');
 
+jest.mock('../stripe', () => {
+  return {
+    stripe: {
+      checkout: {
+        sessions: {
+          create: jest.fn().mockResolvedValue({
+            id: 'sess_test_123',
+            url: 'http://stripe-session-url',
+          }),
+        },
+      },
+    },
+  };
+});
+
 process.env.STRIPE_KEY = "sk_test_51S4gBoKV1BbyfCF56yWO2wNTT7oDYX7S8Ugk2vOCFVHjQttAM2g2VRQtelAfBbWRkw4JDNrwJhY9iOx9OsBnYx1h00DmBqGWHL"
 
 let mongo: any;
@@ -61,7 +76,6 @@ afterAll(async () => {
 
   // Take JSON and encode it as base64
   const base64 = Buffer.from(sessionJSON).toString('base64');
-  console.log('Generated Cookie:', [`session=${base64}`]);
 
   // return a string thats the cookie with the encoded data
   return [`session=${base64}`];
