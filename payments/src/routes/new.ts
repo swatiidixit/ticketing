@@ -22,7 +22,6 @@ router.post(
   [body('orderId').not().isEmpty()],
   validateRequest,
   async (req: Request, res: Response) => {
-    console.log("💳 [PAYMENT REQUEST] Received:", req.body);
 
     const {orderId } = req.body;
 
@@ -40,7 +39,10 @@ router.post(
       throw new BadRequestError('Cannot pay for a cancelled order');
     }
 
+
     try {  
+      const clientUrl = process.env.CLIENT_URL || "http://ticketing.dev";
+
     const session = await stripe.checkout.sessions.create({
         mode: 'payment',
         payment_method_types: ['card'],
@@ -56,18 +58,16 @@ router.post(
             quantity: 1,
           },
         ],
-        success_url: `${process.env.CLIENT_URL}/orders`,
-        cancel_url: `${process.env.CLIENT_URL}/orders/${order.id}?cancelled=true`,
+        success_url: `${clientUrl}/orders`,
+        cancel_url: `${clientUrl}/orders/${order.id}?cancelled=true`,
       });
-
 
       const payment = Payment.build({
         orderId,
         stripeId: session.id,
       });
       await payment.save();
-  
-      // 5. Publish event
+      
       await new PaymentCreatedPublisher(natsWrapper.client).publish({
         id: payment.id,
         orderId: payment.orderId,

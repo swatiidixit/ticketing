@@ -70,7 +70,7 @@ it("returns a 201 with valid inputs", async () => {
   });
   await order.save();
 
-  await request(app)
+  const response = await request(app)
     .post("/api/payments")
     .set("Cookie", global.signin(userId))
     .send({
@@ -79,17 +79,11 @@ it("returns a 201 with valid inputs", async () => {
     })
     .expect(201);
 
-  const stripeCharges = await stripe.charges.list({ limit: 50 });
-  const stripeCharge = stripeCharges.data.find((charge) => {
-    return charge.amount === price * 100;
-  });
+  expect(stripe.checkout.sessions.create).toHaveBeenCalled();
+  expect(response.body.url).toEqual("http://stripe-session-url");
 
-  expect(stripeCharge).toBeDefined();
-  expect(stripeCharge!.currency).toEqual("inr");
-
-  const payment = await Payment.findOne({
-    orderId: order.id,
-    stripeId: stripeCharge!.id,
-  });
-  expect(payment).not.toBeNull();
+  // Check Payment saved in DB
+  const payment = await Payment.findOne({ orderId: order.id });
+  expect(payment).toBeDefined();
+  expect(payment!.stripeId).toEqual("sess_test_123");
 });
