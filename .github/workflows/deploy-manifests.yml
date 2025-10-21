@@ -1,0 +1,40 @@
+name: deploy-manifests
+
+on:
+  push:
+    branches:
+      - master  
+    paths:
+      - 'infra/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install OCI CLI
+        run: |
+          pip install oci-cli
+
+      - name: Configure OCI CLI
+        env:
+          OCI_CONFIG_CONTENT: ${{ secrets.OCI_CONFIG }}
+        run: |
+          mkdir -p ~/.oci
+          echo "$OCI_CONFIG_CONTENT" > ~/.oci/config
+
+      - name: Set up kubeconfig for Oracle
+        run: |
+          mkdir -p ~/.kube
+          oci ce cluster create-kubeconfig \
+            --cluster-id ${{ secrets.OCI_CLUSTER_ID }} \
+            --file ~/.kube/config \
+            --region ${{ secrets.OCI_REGION }} \
+            --token-version 2.0.0 \
+            --kube-endpoint PUBLIC_ENDPOINT
+
+      - name: Deploy manifests to cluster
+        run: |
+          kubectl apply -f infra/k8s
