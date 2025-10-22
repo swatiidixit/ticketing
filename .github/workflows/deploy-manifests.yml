@@ -3,10 +3,10 @@ name: deploy-manifests
 on:
   push:
     branches:
-      - master  
+      - master
     paths:
       - 'infra/**'
-      
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -25,17 +25,17 @@ jobs:
           mkdir -p ~/.oci
           echo "$OCI_CONFIG_CONTENT" > ~/.oci/config
 
-      - name: Set up kubeconfig for Oracle
+      - name: Set up kubeconfig for Oracle cluster
         run: |
-          mkdir -p ~/.kube
+          mkdir -p $HOME/.kube
           oci ce cluster create-kubeconfig \
             --cluster-id ${{ secrets.OCI_CLUSTER_ID }} \
-            --file ~/.kube/config \
             --region ${{ secrets.OCI_REGION }} \
+            --file $HOME/.kube/config \
             --token-version 2.0.0 \
             --kube-endpoint PUBLIC_ENDPOINT
 
       - name: Deploy manifests to cluster
         run: |
-          kubectl apply -f infra/k8s && kubectl apply -f infra/k8s-prod
-
+          kubectl apply -f infra/k8s
+          kubectl apply -f infra/k8s-prod
