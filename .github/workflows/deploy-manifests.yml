@@ -37,4 +37,5 @@ jobs:
 
       - name: Deploy manifests to cluster
         run: |
-          kubectl apply -f infra/k8s
+          kubectl apply -f infra/k8s && kubectl apply -f infra/k8s-prod
+
