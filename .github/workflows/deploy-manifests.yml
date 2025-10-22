@@ -6,20 +6,21 @@ on:
       - master
     paths:
       - 'infra/**'
+  workflow_dispatch: # Allows manual triggering from GitHub UI
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-  
+   
       - uses: actions/checkout@v2
 
-      
+   
       - name: Install OCI CLI
         run: pip install --upgrade oci-cli
 
-     
+ 
       - name: Configure OCI CLI
         env:
           OCI_TENANCY_OCID: ${{ secrets.OCI_TENANCY_OCID }}
@@ -28,20 +29,20 @@ jobs:
           OCI_PRIVATE_KEY: ${{ secrets.OCI_PRIVATE_KEY }}
           OCI_REGION: ${{ secrets.OCI_REGION }}
         run: |
-          mkdir -p ~/.oci
-          echo "${OCI_PRIVATE_KEY}" > ~/.oci/oci_api_key.pem
-          chmod 600 ~/.oci/oci_api_key.pem
+          mkdir -p $HOME/.oci
+          echo "${OCI_PRIVATE_KEY}" > $HOME/.oci/oci_api_key.pem
+          chmod 600 $HOME/.oci/oci_api_key.pem
 
-          echo "[DEFAULT]" > ~/.oci/config
-          echo "user=${OCI_USER_OCID}" >> ~/.oci/config
-          echo "fingerprint=${OCI_FINGERPRINT}" >> ~/.oci/config
-          echo "key_file=$HOME/.oci/oci_api_key.pem" >> ~/.oci/config
-          echo "tenancy=${OCI_TENANCY_OCID}" >> ~/.oci/config
-          echo "region=${OCI_REGION}" >> ~/.oci/config
-          chmod 600 ~/.oci/config
+          echo "[DEFAULT]" > $HOME/.oci/config
+          echo "user=${OCI_USER_OCID}" >> $HOME/.oci/config
+          echo "fingerprint=${OCI_FINGERPRINT}" >> $HOME/.oci/config
+          echo "key_file=$HOME/.oci/oci_api_key.pem" >> $HOME/.oci/config
+          echo "tenancy=${OCI_TENANCY_OCID}" >> $HOME/.oci/config
+          echo "region=${OCI_REGION}" >> $HOME/.oci/config
+          chmod 600 $HOME/.oci/config
 
-      
-      - name: Set up kubeconfig for Oracle cluster
+     
+      - name: Set up kubeconfig
         env:
           OCI_CLUSTER_ID: ${{ secrets.OCI_CLUSTER_ID }}
           OCI_REGION: ${{ secrets.OCI_REGION }}
@@ -52,11 +53,12 @@ jobs:
             --file $HOME/.kube/config \
             --region ${OCI_REGION} \
             --token-version 2.0.0 \
-            --kube-endpoint PUBLIC
+            --kube-endpoint PUBLIC_ENDPOINT
 
      
-      - name: Deploy manifests to cluster
+      - name: Deploy custom manifests
         run: |
           kubectl apply -f infra/k8s
           kubectl apply -f infra/k8s-prod
 
+     
