@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: client
-          image: swati332/client
+          image: docker.io/swati332/client:latest
           # resources:
           #   requests:
           #     cpu: "200m"
