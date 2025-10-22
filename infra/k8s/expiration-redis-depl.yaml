@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: expiration-redis
-          image: redis
+          image: docker.io/library/redis:7.2
           # resources:
           #   requests:
           #     cpu: "300m"
