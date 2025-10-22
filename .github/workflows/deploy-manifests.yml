@@ -12,11 +12,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+  
       - uses: actions/checkout@v2
 
+      
       - name: Install OCI CLI
-        run: pip install oci-cli
+        run: pip install --upgrade oci-cli
 
+     
       - name: Configure OCI CLI
         env:
           OCI_TENANCY_OCID: ${{ secrets.OCI_TENANCY_OCID }}
@@ -32,12 +35,12 @@ jobs:
           echo "[DEFAULT]" > ~/.oci/config
           echo "user=${OCI_USER_OCID}" >> ~/.oci/config
           echo "fingerprint=${OCI_FINGERPRINT}" >> ~/.oci/config
-          echo "key_file=/home/runner/.oci/oci_api_key.pem" >> ~/.oci/config
+          echo "key_file=$HOME/.oci/oci_api_key.pem" >> ~/.oci/config
           echo "tenancy=${OCI_TENANCY_OCID}" >> ~/.oci/config
           echo "region=${OCI_REGION}" >> ~/.oci/config
-
           chmod 600 ~/.oci/config
 
+      
       - name: Set up kubeconfig for Oracle cluster
         env:
           OCI_CLUSTER_ID: ${{ secrets.OCI_CLUSTER_ID }}
@@ -46,12 +49,14 @@ jobs:
           mkdir -p $HOME/.kube
           oci ce cluster create-kubeconfig \
             --cluster-id ${OCI_CLUSTER_ID} \
-            --kubeconfig $HOME/.kube/config \
+            --file $HOME/.kube/config \
             --region ${OCI_REGION} \
             --token-version 2.0.0 \
-            --kube-endpoint PUBLIC_ENDPOINT
+            --kube-endpoint PUBLIC
 
+     
       - name: Deploy manifests to cluster
         run: |
           kubectl apply -f infra/k8s
           kubectl apply -f infra/k8s-prod
+
