@@ -29,14 +29,13 @@ jobs:
           echo "${OCI_PRIVATE_KEY}" > ~/.oci/oci_api_key.pem
           chmod 600 ~/.oci/oci_api_key.pem
 
-          cat > ~/.oci/config <<EOF
-[DEFAULT]
-user=${OCI_USER_OCID}
-fingerprint=${OCI_FINGERPRINT}
-key_file=/home/runner/.oci/oci_api_key.pem
-tenancy=${OCI_TENANCY_OCID}
-region=${OCI_REGION}
-EOF
+          echo "[DEFAULT]" > ~/.oci/config
+          echo "user=${OCI_USER_OCID}" >> ~/.oci/config
+          echo "fingerprint=${OCI_FINGERPRINT}" >> ~/.oci/config
+          echo "key_file=/home/runner/.oci/oci_api_key.pem" >> ~/.oci/config
+          echo "tenancy=${OCI_TENANCY_OCID}" >> ~/.oci/config
+          echo "region=${OCI_REGION}" >> ~/.oci/config
+
           chmod 600 ~/.oci/config
 
       - name: Set up kubeconfig for Oracle cluster
