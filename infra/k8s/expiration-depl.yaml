@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: expiration
-          image: swati332/expiration
+          image: docker.io/swati332/expiration:latest
           env:
             - name: NATS_CLIENT_ID
               valueFrom:

@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: payments
-          image: swati332/payments
+          image: docker.io/swati332/payments:latest
           env:
             - name: NATS_CLIENT_ID
               valueFrom:
