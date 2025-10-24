@@ -41,7 +41,7 @@ router.post(
 
 
     try {  
-      const clientUrl = process.env.CLIENT_URL || "http://ticketing.dev";
+      const clientUrl = process.env.CLIENT_URL ;
 
     const session = await stripe.checkout.sessions.create({
         mode: 'payment',

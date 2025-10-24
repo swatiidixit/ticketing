@@ -37,7 +37,7 @@ spec:
                   name: stripe-secret
                   key: STRIPE_KEY
             - name: CLIENT_URL
-              value: "http://ticketing.dev"      
+              value: "http://ticketingapp.duckdns.org"      
           # resources:
           #   requests:
           #     cpu: "200m"
