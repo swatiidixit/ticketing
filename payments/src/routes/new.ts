@@ -77,7 +77,12 @@ console.log(`[STEP 3] Using client URL: ${clientUrl}`);
         success_url: `${clientUrl}/orders`,
         cancel_url: `${clientUrl}/orders/${order.id}?cancelled=true`,
       });
+     
+ console.log("success..",`${clientUrl}/orders`);
+ console.log("cancel..",`${clientUrl}/orders/${order.id}?cancelled=true`);
+     
 console.log(`[STEP 5] Stripe session created successfully: ${session.id}`);
+console.log(`[STEP 5.1] Session details:`, session);
       const payment = Payment.build({
         orderId,
         stripeId: session.id,
@@ -94,8 +99,11 @@ console.log(`[STEP 5] Stripe session created successfully: ${session.id}`);
       res.status(201).send({ url: session.url });
       console.log(`[SUCCESS] Payment API completed for order ${order.id}`);
 
-    } catch (err) {
+    } catch (err:any) {
       console.error("[FATAL ERROR in /api/payments]", err);
+      if (err.raw) {
+    console.error("Stripe raw error:", err.raw);  // Stripe API errors
+  }
       throw new BadRequestError("Payment session creation failed");
     }
   }
