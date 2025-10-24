@@ -41,7 +41,7 @@ router.post(
 
 
     try {  
-      const clientUrl = process.env.CLIENT_URL ;
+      const clientUrl = process.env.CLIENT_URL || "http://ticketingapp.duckdns.org";
 
     const session = await stripe.checkout.sessions.create({
         mode: 'payment',
