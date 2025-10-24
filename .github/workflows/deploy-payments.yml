@@ -10,6 +10,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      STRIPE_KEY: ${{ secrets.STRIPE_KEY }}
     steps:
       - uses: actions/checkout@v2
       - run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
