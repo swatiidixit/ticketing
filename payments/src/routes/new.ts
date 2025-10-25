@@ -53,7 +53,8 @@ router.post(
       throw new BadRequestError('Cannot pay for a cancelled order');
     }
 
-
+console.log(`[DEBUG] Stripe Key present:`, !!process.env.STRIPE_KEY);
+    console.log(`[DEBUG] Stripe Key starts with:`, process.env.STRIPE_KEY?.substring(0, 10) || 'undefined');
     try {  
       const clientUrl = process.env.CLIENT_URL || "http://ticketingapp.duckdns.org";
 console.log(`[STEP 3] Using client URL: ${clientUrl}`);
@@ -83,6 +84,7 @@ console.log(`[STEP 3] Using client URL: ${clientUrl}`);
      
 console.log(`[STEP 5] Stripe session created successfully: ${session.id}`);
 console.log(`[STEP 5.1] Session details:`, session);
+console.log(`[DEBUG] Stripe session URL: ${session.url}`);
       const payment = Payment.build({
         orderId,
         stripeId: session.id,
@@ -104,6 +106,13 @@ console.log(`[STEP 5.1] Session details:`, session);
       if (err.raw) {
     console.error("Stripe raw error:", err.raw);  // Stripe API errors
   }
+  if (err?.type || err?.message) {
+        console.error('[STRIPE ERROR DETAILS]', {
+          type: err.type,
+          code: err.code,
+          message: err.message,
+        });
+      }
       throw new BadRequestError("Payment session creation failed");
     }
   }
