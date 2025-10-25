@@ -12,7 +12,7 @@ spec:
       labels:
         app: payments
     spec:
-      hostNetwork: true
+     # hostNetwork: true
       containers:
         - name: payments
           image: docker.io/swati332/payments:latest
