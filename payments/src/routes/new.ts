@@ -59,7 +59,7 @@ console.log(`[STEP 3] Using client URL: ${clientUrl}`);
 
     try {  
       console.log(`[STEP 4] Creating Stripe session for order ${order.id}`);
-     session = await stripe.checkout.sessions.create({
+     const stripePromise = await stripe.checkout.sessions.create({
         mode: 'payment',
         payment_method_types: ['card'],
         line_items: [
@@ -80,6 +80,12 @@ console.log(`[STEP 3] Using client URL: ${clientUrl}`);
      
  console.log("success..",`${clientUrl}/orders`);
  console.log("cancel..",`${clientUrl}/orders/${order.id}?cancelled=true`);
+ session = await Promise.race([
+        stripePromise,
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Stripe timeout')), 5000)
+        ),
+      ]);
      
 console.log(`[STEP 5] Stripe session created successfully: ${session.id}`);
 console.log(`[STEP 5.1] Session details:`, session);
