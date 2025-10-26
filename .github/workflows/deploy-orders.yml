@@ -1,0 +1,44 @@
+name: deploy-orders
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'orders/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      - run: cd orders && docker build -t swati332/orders .
+      - run: docker push swati332/orders
+      - name: Install OCI CLI
+        run: |
+          sudo apt-get update
+          sudo apt-get install python3-pip -y
+          pip install oci-cli
+      - name: Setup OCI Config
+        run: |
+          mkdir -p ~/.oci
+          echo "[DEFAULT]" > ~/.oci/config
+          echo "user=${{ secrets.OCI_USER_OCID }}" >> ~/.oci/config
+          echo "fingerprint=${{ secrets.OCI_FINGERPRINT }}" >> ~/.oci/config
+          echo "tenancy=${{ secrets.OCI_TENANCY_OCID }}" >> ~/.oci/config
+          echo "region=${{ secrets.OCI_REGION }}" >> ~/.oci/config
+          echo "${{ secrets.OCI_PRIVATE_KEY }}" > ~/.oci/oci_api_key.pem
+          chmod 600 ~/.oci/oci_api_key.pem
+          echo "key_file=~/.oci/oci_api_key.pem" >> ~/.oci/config
+      - name: Connect to Oracle Cluster
+        run: |
+          oci ce cluster create-kubeconfig \
+            --cluster-id ocid1.cluster.oc1.eu-frankfurt-1.aaaaaaaakppay4yp2p6y6nohhjorelf54yyzyroywgg5e7jgyc7azy3l6nka \
+            --region eu-frankfurt-1 \
+            --file ~/.kube/config
+      - name: Restart orders deployment
+        run: kubectl rollout restart deployment orders-depl

@@ -115,6 +115,13 @@ console.log(`[STEP 5.1] Session details:`, session);
       if (err.raw) {
     console.error("Stripe raw error:", err.raw);  // Stripe API errors
   }
+  if (err?.type || err?.message) {
+        console.error('[STRIPE ERROR DETAILS]', {
+          type: err.type,
+          code: err.code,
+          message: err.message,
+        });
+      }
       throw new BadRequestError("Payment session creation failed");
     }
   }*/
